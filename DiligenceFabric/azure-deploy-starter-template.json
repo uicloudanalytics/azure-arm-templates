@@ -58,6 +58,7 @@
             "location": "[resourceGroup().location]",
             "kind": "app",
             "properties": {
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('aspName'))]",
                 "alwaysOn": false,
                 "autoHealEnabled": false,
                 "clientAffinityEnabled": true,
