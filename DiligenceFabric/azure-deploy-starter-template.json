@@ -46,6 +46,9 @@
             }
         },
         {
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', parameters('aspName'))]"
+            ],
             "tags": {
                 "AzEnvironment": "[parameters('environment')]"
             },
