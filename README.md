@@ -1,4 +1,4 @@
-# DF Static Template
+# ARM Template Repository
 
 <div align="center">
 
