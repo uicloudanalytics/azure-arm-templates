@@ -1,0 +1,210 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "websiteName": {
+            "type": "string",
+            "defaultValue": "[format('web-{0}', uniqueString(resourceGroup().id))]",
+            "metadata": {
+                "description": "Name of the App Service Web App"
+            }
+        },
+        "aspName": {
+            "type": "string",
+            "defaultValue": "[format('asp-{0}', uniqueString(resourceGroup().id))]",
+            "metadata": {
+                "description": "Name of the App Service Plan"
+            }
+        },
+        "environment": {
+            "type": "string",
+            "defaultValue": "Development",
+            "allowedValues": [
+                "Development",
+                "UAT",
+                "Production"
+            ],
+            "metadata": {
+                "description": "Application environment"
+            }
+        }
+    },
+    "functions": [],
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "2021-02-01",
+            "name": "[parameters('aspName')]",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "displayName": "[parameters('aspName')]"
+            },
+            "sku": {
+                "name": "F1",
+                "capacity": 1
+            }
+        },
+        {
+            "tags": {
+                "AzEnvironment": "[parameters('environment')]"
+            },
+            "name": "[parameters('websiteName')]",
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2020-12-01",
+            "location": "[resourceGroup().location]",
+            "kind": "app",
+            "properties": {
+                "alwaysOn": false,
+                "autoHealEnabled": false,
+                "clientAffinityEnabled": true,
+                "cors": {
+                    "allowedOrigins": [],
+                    "supportCredentials": false
+                },
+                "defaultDocuments": [
+                    "Default.htm",
+                    "Default.html",
+                    "Default.asp",
+                    "index.htm",
+                    "index.html",
+                    "iisstart.htm",
+                    "default.aspx",
+                    "index.php",
+                    "hostingstart.html"
+                ],
+                "detailedErrorLoggingEnabled": false,
+                "scmType": "None",
+                "experiments": {
+                    "rampUpRules": []
+                },
+                "ftpsState": "AllAllowed",
+                "hostingEnvironment": "''",
+                "http20Enabled": true,
+                "httpLoggingEnabled": false,
+                "loadBalancing": "LeastRequests",
+                "localMySqlEnabled": false,
+                "logsDirectorySizeLimit": 35,
+                "managedPipelineMode": "Integrated",
+                "minTlsVersion": "1.2",
+                "name": "[parameters('websiteName')]",
+                "netFrameworkVersion": "v4.0",
+                "numberOfWorkers": 1,
+                "phpVersion": "5.6",
+                "publishingUsername": "[concat('$', parameters('websiteName'))]",
+                "remoteDebuggingEnabled": false,
+                "remoteDebuggingVersion": "VS2019",
+                "requestTracingEnabled": false,
+                "reservedInstanceCount": 0,
+                "siteConfig": {
+                    "netFrameworkVersion": "v4.0",
+                    "scmIpSecurityRestrictionsUseMain": true,
+                    "alwaysOn": "true",
+                    "ipSecurityRestrictions": [
+                        {
+                            "ipAddress": "AzureFrontDoor.Backend",
+                            "action": "Allow",
+                            "tag": "ServiceTag",
+                            "name": "FrontDoor-Access",
+                            "priority": 1
+                        },
+                        {
+                            "ipAddress": "162.239.87.113/32",
+                            "action": "Allow",
+                            "tag": "Default",
+                            "priority": 1,
+                            "name": "site-UBTIFullAccess"
+                        },
+                        {
+                            "ipAddress": "106.51.99.62/32",
+                            "action": "Allow",
+                            "tag": "Default",
+                            "priority": 1,
+                            "name": "site-UIAP1FullAccess"
+                        },
+                        {
+                            "ipAddress": "182.76.127.122/32",
+                            "action": "Allow",
+                            "tag": "Default",
+                            "priority": 1,
+                            "name": "site-UIAP2FullAccess"
+                        },
+                        {
+                            "ipAddress": "125.20.158.210/32",
+                            "action": "Allow",
+                            "tag": "Default",
+                            "priority": 1,
+                            "name": "uiap-ind-airtel"
+                        },
+                        {
+                            "ipAddress": "123.63.246.69/32",
+                            "action": "Allow",
+                            "tag": "Default",
+                            "priority": 1,
+                            "name": "uiap-ind-vodafone"
+                        },
+                        {
+                            "ipAddress": "Any",
+                            "action": "Deny",
+                            "priority": 2147483647,
+                            "name": "Deny all",
+                            "description": "Deny all access"
+                        }
+                    ],
+                    "appSettings": [
+                        {
+                            "name": "DiagnosticServices_EXTENSION_VERSION",
+                            "value": "disabled"
+                        },
+                        {
+                            "name": "InstrumentationEngine_EXTENSION_VERSION",
+                            "value": "disabled"
+                        },
+                        {
+                            "name": "SnapshotDebugger_EXTENSION_VERSION",
+                            "value": "disabled"
+                        },
+                        {
+                            "name": "SCM_DO_BUILD_DURING_DEPLOYMENT",
+                            "value": "true",
+                            "slotSetting": false
+                        },
+                        {
+                            "name": "WEBSITE_NODE_DEFAULT_VERSION",
+                            "value": "~18",
+                            "slotSetting": false
+                        }
+                    ],
+                    "metadata": [
+                        {
+                            "name": "CURRENT_STACK",
+                            "value": "node"
+                        }
+                    ]
+                }
+            }
+        }
+    ],
+    "outputs": {
+        "inboundIpAddress": {
+            "type": "string",
+            "value": "[reference(parameters('websiteName'), '2020-12-01').inboundIpAddress]"
+        },
+        "possibleInboundIpAddresses": {
+            "type": "string",
+            "value": "[reference(parameters('websiteName'), '2020-12-01').possibleInboundIpAddresses]"
+        },
+        "outboundIpAddress": {
+            "type": "string",
+            "value": "[reference(parameters('websiteName'), '2020-12-01').outboundIpAddresses]"
+        },
+        "possibleOutboundIpaddresses": {
+            "type": "string",
+            "value": "[reference(parameters('websiteName'), '2020-12-01').possibleOutboundIpaddresses]"
+        },
+        "ro": {
+            "type": "object",
+            "value": "[reference(parameters('websiteName'), '2020-12-01')]"
+        }
+    }
+}
