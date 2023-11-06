@@ -103,7 +103,7 @@
                 "siteConfig": {
                     "netFrameworkVersion": "v4.0",
                     "scmIpSecurityRestrictionsUseMain": true,
-                    "alwaysOn": "true",
+                    "alwaysOn": false,
                     "ipSecurityRestrictions": [
                         {
                             "ipAddress": "AzureFrontDoor.Backend",
